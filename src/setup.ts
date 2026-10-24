@@ -96,24 +96,29 @@ for (const sql of [
 
 const q = (value: string) => `'${value.replace(/'/g, "''")}'`;
 
-// 基础分类（重复执行时只保留一条）
-await db("db_delete", "DELETE FROM setting_note WHERE key = 'base' AND language = 'default'");
+// 通用分类（旧 general）与基础分类：重复执行时只保留一条
+await db("db_delete", "DELETE FROM setting_note WHERE key IN ('general', 'base') AND language = 'default'");
+await db(
+  "db_insert",
+  `INSERT INTO setting_note (key, language, title, description)
+   VALUES ('general', 'default', '通用', '通用设置与内部缓存')`,
+);
 await db(
   "db_insert",
   `INSERT INTO setting_note (key, language, title, description)
    VALUES ('base', 'default', '基础', '系统基础设置')`,
 );
 
+// 旧 general 项的显示标题，不改变已有值
+await db("db_insert", "UPDATE setting SET title = '设计软件名称' WHERE key = 'designsoft_name' AND (title IS NULL OR title = '')");
+await db("db_insert", "UPDATE setting SET title = '设计软件版本' WHERE key = 'designsoft_version' AND (title IS NULL OR title = '')");
+
 // 基础设置默认值；INSERT OR IGNORE 不覆盖用户已修改的值
 const baseSettings: Array<[string, string, string, string, string]> = [
   ["ai_supplier", "AI 对话供应商", "siliconflow", "enum", "可选：siliconflow / deepseek / openai"],
-  ["ai_model", "默认对话模型", "deepseek-ai/DeepSeek-V4-Flash", "string", "与供应商对应的模型 ID"],
   ["language", "界面语言", "zh-CN", "enum", "zh-CN / en"],
-  ["theme", "主题", "light", "enum", "light / dark / auto"],
   ["auto_update", "自动更新", "true", "boolean", "启动时检查并安装更新"],
   ["log_level", "日志级别", "info", "enum", "error / warn / info / debug"],
-  ["default_page", "启动页", "/chat", "string", "启动后默认打开的页面"],
-  ["max_upload_size", "附件大小上限（MB）", "50", "number", "单文件上传上限"],
   ["timezone", "时区", "Asia/Shanghai", "string", "IANA 时区，例如 Asia/Shanghai"],
 ];
 

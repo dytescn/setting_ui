@@ -1,6 +1,6 @@
 {
   "name": "setting",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "setting for piksel",
   "keywords": [
     "setting"
@@ -9,8 +9,8 @@
   "type": "web",
   "dependencies-web": {},
   "exports": {
-    "./assets/project_info_1_0_3.js": "info.js",
-    "./assets/project_base_1_0_3.css": "base.css",
+    "./assets/project_info_1_0_4.js": "info.js",
+    "./assets/project_base_1_0_4.css": "base.css",
     "./src/setup.ts": "setup.ts"
   },
   "init": [
