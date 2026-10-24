@@ -49,8 +49,8 @@ const search = globalThis.location.search;
 
 if (currentPath === "/" || currentPath === "") {
   // 根路径默认跳转到聊天页
-  GlobalPagesRoute.replace("/setting/design" + search);
+  GlobalPagesRoute.replace("/setting/info");
 } else {
   // 非根路径，直接触发当前路径的路由渲染（确保刷新/直接访问不会白屏）
-  GlobalPagesRoute.replace(currentPath + search);
+  GlobalPagesRoute.replace("/setting/info");
 }

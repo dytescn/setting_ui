@@ -35,51 +35,7 @@ await fetch(API_URL, {
     }),
 });
 
-await fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/libary", "FFI-Symbol": "db_insert" },
-    body: JSON.stringify({
-        path: ROUTER_DB,
-        sql: `INSERT INTO routers (id, title, icon, hide, path, url, show, parent_id, level)
-              VALUES (502, '设置', '', 1, '/setting/design', '/setting/design.js', 1, 500, 2)`,
-    }),
-});
-console.log("设置子路由插入成功");
-
-
-// 创建 designsoft 表（存储软件信息）
-const createRes1 = await fetch("http://127.0.0.1:44944/database", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/libary",
-    "FFI-Symbol": "db_create",
-  },
-  body: JSON.stringify({
-    path: "./info",
-    table: "designsoft",
-    schema: `id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            version TEXT,
-            major_version TEXT,
-            minor_version TEXT,
-            install_path TEXT,
-            publisher TEXT,
-            install_date TEXT,
-            exe_path TEXT,
-            status TEXT DEFAULT '未安装' CHECK(status IN ('未安装', '已安装但未启动', '已启动')),
-            config TEXT,
-            child TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP`,
-  }),
-});
-
-console.log(await createRes1.json());
-
-
 // 初始化数据
-
-// 临时初始化脚本
 const initRes = await fetch("http://127.0.0.1:44944/database", {
   method: "POST",
   headers: { "Content-Type": "application/libary", "FFI-Symbol": "db_create" },
@@ -88,11 +44,34 @@ const initRes = await fetch("http://127.0.0.1:44944/database", {
     table: "setting",
     schema: `id INTEGER PRIMARY KEY AUTOINCREMENT,
              key TEXT NOT NULL UNIQUE,
+             title TEXT,
              value TEXT,
+             value_type TEXT DEFAULT 'string',
              category TEXT DEFAULT 'general',
              description TEXT,
              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
              updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP`
   })
 });
+
+// 初始化分类表
+const noteRes = await fetch("http://127.0.0.1:44944/database", {
+  method: "POST",
+  headers: { "Content-Type": "application/libary", "FFI-Symbol": "db_create" },
+  body: JSON.stringify({
+    path: "./info",
+    table: "setting_note",
+    schema: `id INTEGER PRIMARY KEY AUTOINCREMENT,
+             key TEXT NOT NULL,
+             language TEXT NOT NULL DEFAULT 'default',
+             title TEXT NOT NULL,
+             description TEXT,
+             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+             UNIQUE(key, language)`
+  })
+});
+
+console.log(await noteRes.json());
+
 console.log(await initRes.json());
