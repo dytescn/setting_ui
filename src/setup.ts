@@ -75,3 +75,58 @@ const noteRes = await fetch("http://127.0.0.1:44944/database", {
 console.log(await noteRes.json());
 
 console.log(await initRes.json());
+
+// ========== 4. 基础分类与默认设置 ==========
+// 旧库可能缺少 title / value_type 列，先做容错迁移（列已存在时忽略错误）
+const db = async (symbol: string, sql: string) => {
+  const res = await fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/libary", "FFI-Symbol": symbol },
+    body: JSON.stringify({ path: "./info", sql }),
+  });
+  return await res.json().catch(() => null);
+};
+
+for (const sql of [
+  "ALTER TABLE setting ADD COLUMN title TEXT",
+  "ALTER TABLE setting ADD COLUMN value_type TEXT DEFAULT 'string'",
+]) {
+  await db("db_insert", sql);
+}
+
+const q = (value: string) => `'${value.replace(/'/g, "''")}'`;
+
+// 基础分类（重复执行时只保留一条）
+await db("db_delete", "DELETE FROM setting_note WHERE key = 'base' AND language = 'default'");
+await db(
+  "db_insert",
+  `INSERT INTO setting_note (key, language, title, description)
+   VALUES ('base', 'default', '基础', '系统基础设置')`,
+);
+
+// 基础设置默认值；INSERT OR IGNORE 不覆盖用户已修改的值
+const baseSettings: Array<[string, string, string, string, string]> = [
+  ["ai_supplier", "AI 对话供应商", "siliconflow", "enum", "可选：siliconflow / deepseek / openai"],
+  ["ai_model", "默认对话模型", "deepseek-ai/DeepSeek-V4-Flash", "string", "与供应商对应的模型 ID"],
+  ["language", "界面语言", "zh-CN", "enum", "zh-CN / en"],
+  ["theme", "主题", "light", "enum", "light / dark / auto"],
+  ["auto_update", "自动更新", "true", "boolean", "启动时检查并安装更新"],
+  ["log_level", "日志级别", "info", "enum", "error / warn / info / debug"],
+  ["default_page", "启动页", "/chat", "string", "启动后默认打开的页面"],
+  ["max_upload_size", "附件大小上限（MB）", "50", "number", "单文件上传上限"],
+  ["timezone", "时区", "Asia/Shanghai", "string", "IANA 时区，例如 Asia/Shanghai"],
+];
+
+const baseValues = baseSettings
+  .map(([key, title, value, type, description]) =>
+    `(${[key, title, value, type, "base", description].map(q).join(", ")})`
+  )
+  .join(", ");
+
+await db(
+  "db_insert",
+  `INSERT OR IGNORE INTO setting (key, title, value, value_type, category, description)
+   VALUES ${baseValues}`,
+);
+
+console.log("基础设置分类与默认值初始化完成");
