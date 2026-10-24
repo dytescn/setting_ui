@@ -14,3 +14,11 @@
 - `deno task pack`：通过，产物 `assets/project_info_1_0_1.js`、`assets/project_design_1_0_1.js`、`assets/project_base_1_0_1.css`。
 - `dytes.json`：`1.0.1`，exports 指向上述产物。
 - 已发布：`webs/setting/1.0.1/`（info.js / design.js / setup.ts）；`packages.json` 1.0.0 → 1.0.1。
+
+- [ ] SU-06 旧库迁移：旧 `setting` 表缺少 `title` / `value_type`，且 `setting_note` 为空时页面只显示标题、不渲染分类。
+  - 2026-10-24 已在 `app/piksel/info.db` 手动执行：
+    `ALTER TABLE setting ADD COLUMN title TEXT`、
+    `ALTER TABLE setting ADD COLUMN value_type TEXT DEFAULT 'string'`、
+    `UPDATE setting SET title = key WHERE title IS NULL`、
+    插入 `setting_note('silicon_info','default','硅基流动','硅基流动 API 配置')`。
+  - 建议后续在 `src/setup.ts` 中加入容错的列迁移与默认分类初始化。
