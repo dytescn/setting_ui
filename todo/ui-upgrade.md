@@ -13,4 +13,4 @@
 
 - `deno task pack`：通过，产物 `assets/project_info_1_0_1.js`、`assets/project_design_1_0_1.js`、`assets/project_base_1_0_1.css`。
 - `dytes.json`：`1.0.1`，exports 指向上述产物。
-- 待发布：`webs/setting/1.0.1/`。
+- 已发布：`webs/setting/1.0.1/`（info.js / design.js / setup.ts）；`packages.json` 1.0.0 → 1.0.1。
