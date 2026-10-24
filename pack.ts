@@ -1,6 +1,6 @@
 // 统一打包入口：deno task pack
 // 依次调用 @funxdata/toolkit/pack，生成 info / design / base.css 产物
-const entries = ["src/info.ts", "src/design.ts", "assets/css/base.css"];
+const entries = ["src/info.ts", "assets/css/base.css"];
 
 for (const entry of entries) {
   console.log(`\n==> pack ${entry}`);
