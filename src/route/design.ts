@@ -74,7 +74,7 @@ function bindCheckButton() {
             }
             // 同步到数据库
             for (const software of result.data.list) {
-                const existing = await querySoftware(`name = '${software.name}' AND version = '${software.version}'`);
+                const existing = await querySoftware({ name: software.name, version: software.version });
                 if (existing.length > 0) {
                     await updateSoftware(existing[0].id, {
                         install_path: software.install_path || "",
